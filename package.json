@@ -2,7 +2,7 @@
   "name": "RevStack.Identity",
   "version": "0.9.1",
   "description": "RevStack c# generic repository abstraction of Asp.net Identity",
-  "main": "index.js",
+  "main": "RevStack.Identity.sln",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
