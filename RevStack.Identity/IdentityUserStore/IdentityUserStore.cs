@@ -9,30 +9,35 @@ using RevStack.Mvc;
 
 namespace RevStack.Identity
 {
-    public class IdentityUserStore<TUser,TKey> : IIdentityUserStore<TUser,TKey> where TUser: class,IIdentityUser<TKey>
+    public class IdentityUserStore<TUser,TUserLogin,TUserClaim,TUserRole,TRole,TKey> : IIdentityUserStore<TUser,TKey> 
+        where TUser: class,IIdentityUser<TKey> 
+        where TUserLogin:class,IIdentityUserLogin<TKey> 
+        where TUserClaim:class,IIdentityUserClaim<TKey>
+        where TUserRole : class, IIdentityUserRole<TKey>
+        where TRole : class, IIdentityRole
     {
         #region "Private Fields"
-        private readonly IIdentityUserLogin<TKey> _identityUserLogin;
-        private readonly IIdentityUserClaim<TKey> _identityUserClaim;
-        private readonly IIdentityUserRole<TKey> _identityUserRole;
-
-        private readonly IRepository<IIdentityUser<TKey>, TKey> _userRepository;
-        private readonly IRepository<IIdentityUserLogin<TKey>, TKey> _userLoginRepository;
-        private readonly IRepository<IIdentityUserClaim<TKey>, TKey> _userClaimRepository;
-        private readonly IRepository<IIdentityUserRole<TKey>, TKey> _userRoleRepository;
-        private readonly IRepository<IIdentityRole, string> _roleRepository;
+        private const string DUPLICATE_USER_MSG = "Error: Cannot Create User.Username already in use";
+        private readonly IRepository<TUser, TKey> _userRepository;
+        private readonly IRepository<TUserLogin, TKey> _userLoginRepository;
+        private readonly IRepository<TUserClaim, TKey> _userClaimRepository;
+        private readonly IRepository<TUserRole, TKey> _userRoleRepository;
+        private readonly IRepository<TRole,string> _roleRepository;
+        private readonly Func<TUserLogin> _identityUserLoginFactory;
+        private readonly Func<TUserClaim> _identityUserClaimFactory;
+        private readonly Func<TUserRole> _identityUserRoleFactory;
 
         #endregion
 
         #region "Constructor"
-        public IdentityUserStore(IRepository<IIdentityUser<TKey>, TKey> userRepository, 
-            IRepository<IIdentityUserLogin<TKey>, TKey> userLoginRepository,
-            IRepository<IIdentityUserClaim<TKey>, TKey> userClaimRepository, 
-            IRepository<IIdentityUserRole<TKey>, TKey> userRoleRepository,
-            IRepository<IIdentityRole, string> roleRepository,
-            IIdentityUserLogin<TKey> identityUserLogin,
-            IIdentityUserClaim<TKey> identityUserClaim, 
-            IIdentityUserRole<TKey> identityUserRole
+        public IdentityUserStore(IRepository<TUser, TKey> userRepository, 
+            IRepository<TUserLogin, TKey> userLoginRepository,
+            IRepository<TUserClaim, TKey> userClaimRepository, 
+            IRepository<TUserRole, TKey> userRoleRepository,
+            IRepository<TRole, string> roleRepository,
+            Func<TUserLogin> identityUserLoginFactory,
+            Func<TUserClaim> identityUserClaimFactory,
+            Func<TUserRole> identityUserRoleFactory
 
             )
         {
@@ -41,9 +46,9 @@ namespace RevStack.Identity
             _userClaimRepository = userClaimRepository;
             _userRoleRepository = userRoleRepository;
             _roleRepository = roleRepository;
-            _identityUserLogin = identityUserLogin;
-            _identityUserClaim = identityUserClaim;
-            _identityUserRole = identityUserRole;
+            _identityUserLoginFactory = identityUserLoginFactory;
+            _identityUserClaimFactory = identityUserClaimFactory;
+            _identityUserRoleFactory = identityUserRoleFactory;
         }
         #endregion
 
@@ -292,11 +297,12 @@ namespace RevStack.Identity
 
         private void _addLogin(TUser user, UserLoginInfo login)
         {
-            _identityUserLogin.Id = user.Id;
-            _identityUserLogin.LoginProvider = login.LoginProvider;
-            _identityUserLogin.ProviderKey = login.ProviderKey;
+            var identityUserLogin = _identityUserLoginFactory();
+            identityUserLogin.Id = user.Id;
+            identityUserLogin.LoginProvider = login.LoginProvider;
+            identityUserLogin.ProviderKey = login.ProviderKey;
 
-            _userLoginRepository.Add(_identityUserLogin);
+            _userLoginRepository.Add(identityUserLogin);
 
         }
 
@@ -348,11 +354,12 @@ namespace RevStack.Identity
 
         private void _addClaim(TUser user, Claim claim)
         {
-            _identityUserClaim.UserId = user.Id;
-            _identityUserClaim.ClaimType = claim.Type;
-            _identityUserClaim.ClaimValue = claim.Value;
+            var identityUserClaim = _identityUserClaimFactory();
+            identityUserClaim.UserId = user.Id;
+            identityUserClaim.ClaimType = claim.Type;
+            identityUserClaim.ClaimValue = claim.Value;
 
-            _userClaimRepository.Add(_identityUserClaim);
+            _userClaimRepository.Add(identityUserClaim);
         }
 
         private void _removeClaim(TUser user, Claim claim)
@@ -370,10 +377,11 @@ namespace RevStack.Identity
             var role = _roleRepository.Find(x => x.Name == roleName).ToSingleOrDefault();
             if(role!=null)
             {
-                _identityUserRole.UserId = user.Id;
-                _identityUserRole.RoleId = role.Id;
+                var identityUserRole = _identityUserRoleFactory();
+                identityUserRole.UserId = user.Id;
+                identityUserRole.RoleId = role.Id;
 
-                _userRoleRepository.Add(_identityUserRole);
+                _userRoleRepository.Add(identityUserRole);
             }
         }
 
@@ -426,7 +434,7 @@ namespace RevStack.Identity
         private void _setPasswordHash(TUser user, string passwordHash)
         {
             user.PasswordHash = passwordHash;
-            _userRepository.Update(user);
+            if (_userExists(user.UserName)) _userRepository.Update(user);
         }
 
         private string _getPasswordHash(TUser user)
@@ -442,7 +450,7 @@ namespace RevStack.Identity
         private void _setSecurityStamp(TUser user, string stamp)
         {
             user.SecurityStamp = stamp;
-            _userRepository.Update(user);
+            if (_userExists(user.UserName)) _userRepository.Update(user);
         }
 
         private string _getSecurityStamp(TUser user)
@@ -453,7 +461,7 @@ namespace RevStack.Identity
         private void _setEmail(TUser user, string email)
         {
             user.Email = email;
-            _userRepository.Update(user);
+            if(_userExists(user.UserName)) _userRepository.Update(user);
         }
 
         private string _getEmail(TUser user)
@@ -549,6 +557,13 @@ namespace RevStack.Identity
         private bool _getTwoFactorEnabled(TUser user)
         {
             return user.IsTwoFactorEnabled;
+        }
+
+        private bool _userExists(string userName)
+        {
+            var _existingUser = _findByName(userName);
+            return (_existingUser != null);
+           
         }
         #endregion
 

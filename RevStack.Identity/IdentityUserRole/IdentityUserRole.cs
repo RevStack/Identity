@@ -2,6 +2,14 @@
 
 namespace RevStack.Identity
 {
+    public class IdentityUserRole : IdentityUserRole<string>
+    {
+        public IdentityUserRole()
+        {
+            Id = Guid.NewGuid().ToString();
+        }
+    }
+
     public class IdentityUserRole<TKey> : IIdentityUserRole<TKey>
     {
         public TKey Id { get; set; }

@@ -36,3 +36,7 @@
 \\Mac\Home\Documents\Development\mono\RevStack\updated\RevStack.Identity\RevStack.Identity\obj\Debug\RevStack.Identity.csprojResolveAssemblyReference.cache
 \\Mac\Home\Documents\Development\mono\RevStack\updated\RevStack.Identity\RevStack.Identity\obj\Debug\RevStack.Identity.dll
 \\Mac\Home\Documents\Development\mono\RevStack\updated\RevStack.Identity\RevStack.Identity\obj\Debug\RevStack.Identity.pdb
+\\Mac\Home\Documents\Development\mono\RevStack\updated\RevStack.Identity\RevStack.Identity\bin\Debug\System.Web.Http.dll
+\\Mac\Home\Documents\Development\mono\RevStack\updated\RevStack.Identity\RevStack.Identity\bin\Debug\System.Net.Http.Formatting.dll
+\\Mac\Home\Documents\Development\mono\RevStack\updated\RevStack.Identity\RevStack.Identity\bin\Debug\System.Web.Http.xml
+\\Mac\Home\Documents\Development\mono\RevStack\updated\RevStack.Identity\RevStack.Identity\bin\Debug\System.Net.Http.Formatting.xml

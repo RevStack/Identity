@@ -2,6 +2,13 @@
 
 namespace RevStack.Identity
 {
+    public class IdentityUserClaim: IdentityUserClaim<string>
+    {
+        public IdentityUserClaim()
+        {
+            Id = Guid.NewGuid().ToString();
+        }
+    }
     public class IdentityUserClaim<TKey> : IIdentityUserClaim<TKey>
     {
         public TKey Id { get; set; }

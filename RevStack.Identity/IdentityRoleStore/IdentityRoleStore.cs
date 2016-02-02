@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
 using RevStack.Pattern;
 using RevStack.Mvc;
 
 namespace RevStack.Identity
 {
-    public class IdentityRoleStore<TRole> : IRoleStore<TRole> where TRole :class,IIdentityRole
+    public class IdentityRoleStore<TRole> : IIdentityRoleStore<TRole> where TRole : class, IIdentityRole
     {
         #region "Private Fields"
-        private readonly IRepository<IIdentityRole, string> _roleRepository;
-       
+        private readonly IRepository<TRole,string> _roleRepository;
         #endregion
 
         #region "Constructor"
-        public IdentityRoleStore(IRepository<IIdentityRole, string> roleRepository)
+        public IdentityRoleStore(IRepository<TRole,string> roleRepository)
         {
             _roleRepository = roleRepository;
            

@@ -50,7 +50,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IdentityMessage\IdentityEmail.cs" />
+    <Compile Include="IdentityMessage\IdentitySms.cs" />
     <Compile Include="IdentityRoleStore\IdentityRoleStore.cs" />
+    <Compile Include="IdentityRoleStore\IIdentityRoleStore.cs" />
     <Compile Include="IdentityRole\IdentityRole.cs" />
     <Compile Include="IdentityRole\IIdentityRole.cs" />
     <Compile Include="IdentityUserClaim\IdentityUserClaim.cs" />
