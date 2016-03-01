@@ -7,6 +7,6 @@ namespace RevStack.Identity
     public interface IIdentityEmailService : IIdentityMessageService
     {
         string Id { get; }
-        Task SendAsync(IdentityMessage message, string recipientAddress);
+        Task SendAsync(IdentityMessage message, string senderAddress);
     }
 }
