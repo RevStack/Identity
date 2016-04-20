@@ -8,5 +8,7 @@ namespace RevStack.Identity
     {
         string Id { get; }
         Task SendAsync(IdentityMessage message, string senderAddress);
+        Task SendAsync(IdentityMessage message, bool isHTML);
+        Task SendAsync(IdentityMessage message, string senderAddress,bool isHTML);
     }
 }
