@@ -17,5 +17,6 @@ namespace RevStack.Identity
         bool IsTwoFactorEnabled { get; set; }
         int AccessFailedCount { get; set; }
         DateTimeOffset? LockoutEndDate { get; set; }
+        DateTime SignUpDate { get; set; }
     }
 }

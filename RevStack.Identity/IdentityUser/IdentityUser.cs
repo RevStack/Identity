@@ -36,6 +36,7 @@ namespace RevStack.Identity
         public virtual bool IsTwoFactorEnabled { get; set; }
         public virtual int AccessFailedCount { get; set; }
         public virtual DateTimeOffset? LockoutEndDate { get; set; }
+        public virtual DateTime SignUpDate { get; set; }
         public override string ToString()
         {
             return UserName;
